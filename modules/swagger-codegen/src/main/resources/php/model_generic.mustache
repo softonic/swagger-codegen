@@ -1,4 +1,4 @@
-class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^parentSchema}}implements ModelInterface, ArrayAccess{{/parentSchema}}
+class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^parentSchema}}implements ModelInterface, ArrayAccess, JsonSerializable{{/parentSchema}}
 {
     const DISCRIMINATOR = {{#discriminator}}'{{discriminator}}'{{/discriminator}}{{^discriminator}}null{{/discriminator}};
 
@@ -161,7 +161,7 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^pa
 
         {{/parentSchema}}
         {{#vars}}
-        $this->container['{{name}}'] = isset($data['{{name}}']) ? $data['{{name}}'] : {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}};
+        if (array_key_exists('{{name}}', $data)) $this->container['{{name}}'] = $data['{{name}}'];
         {{/vars}}
         {{#discriminator}}
 
@@ -187,14 +187,14 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^pa
 
         {{#vars}}
         {{#required}}
-        if ($this->container['{{name}}'] === null) {
+        if (array_key_exists('{{name}}', $this->container) && $this->container['{{name}}'] === null) {
             $invalidProperties[] = "'{{name}}' can't be null";
         }
         {{/required}}
         {{#isEnum}}
         {{^isContainer}}
         $allowedValues = $this->{{getter}}AllowableValues();
-        if ({{^required}}!is_null($this->container['{{name}}']) && {{/required}}!in_array($this->container['{{name}}'], $allowedValues)) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}!in_array($this->container['{{name}}'], $allowedValues)) {
             $invalidProperties[] = sprintf(
                 "invalid value for '{{name}}', must be one of '%s'",
                 implode("', '", $allowedValues)
@@ -205,43 +205,43 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^pa
         {{/isEnum}}
         {{#hasValidation}}
         {{#maxLength}}
-        if ({{^required}}!is_null($this->container['{{name}}']) && {{/required}}(strlen($this->container['{{name}}']) > {{maxLength}})) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}(strlen($this->container['{{name}}']) > {{maxLength}})) {
             $invalidProperties[] = "invalid value for '{{name}}', the character length must be smaller than or equal to {{{maxLength}}}.";
         }
 
         {{/maxLength}}
         {{#minLength}}
-        if ({{^required}}!is_null($this->container['{{name}}']) && {{/required}}(strlen($this->container['{{name}}']) < {{minLength}})) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}(strlen($this->container['{{name}}']) < {{minLength}})) {
             $invalidProperties[] = "invalid value for '{{name}}', the character length must be bigger than or equal to {{{minLength}}}.";
         }
 
         {{/minLength}}
         {{#maximum}}
-        if ({{^required}}!is_null($this->container['{{name}}']) && {{/required}}($this->container['{{name}}'] >{{#exclusiveMaximum}}={{/exclusiveMaximum}} {{maximum}})) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}($this->container['{{name}}'] >{{#exclusiveMaximum}}={{/exclusiveMaximum}} {{maximum}})) {
             $invalidProperties[] = "invalid value for '{{name}}', must be smaller than {{^exclusiveMaximum}}or equal to {{/exclusiveMaximum}}{{maximum}}.";
         }
 
         {{/maximum}}
         {{#minimum}}
-        if ({{^required}}!is_null($this->container['{{name}}']) && {{/required}}($this->container['{{name}}'] <{{#exclusiveMinimum}}={{/exclusiveMinimum}} {{minimum}})) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}($this->container['{{name}}'] <{{#exclusiveMinimum}}={{/exclusiveMinimum}} {{minimum}})) {
             $invalidProperties[] = "invalid value for '{{name}}', must be bigger than {{^exclusiveMinimum}}or equal to {{/exclusiveMinimum}}{{minimum}}.";
         }
 
         {{/minimum}}
         {{#pattern}}
-        if ({{^required}}!is_null($this->container['{{name}}']) && {{/required}}!preg_match("{{{pattern}}}", $this->container['{{name}}'])) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}!preg_match("{{{pattern}}}", $this->container['{{name}}'])) {
             $invalidProperties[] = "invalid value for '{{name}}', must be conform to the pattern {{{pattern}}}.";
         }
 
         {{/pattern}}
         {{#maxItems}}
-        if ({{^required}}!is_null($this->container['{{name}}']) && {{/required}}(count($this->container['{{name}}']) > {{maxItems}})) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}(count($this->container['{{name}}']) > {{maxItems}})) {
             $invalidProperties[] = "invalid value for '{{name}}', number of items must be less than or equal to {{{maxItems}}}.";
         }
 
         {{/maxItems}}
         {{#minItems}}
-        if ({{^required}}!is_null($this->container['{{name}}']) && {{/required}}(count($this->container['{{name}}']) < {{minItems}})) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}(count($this->container['{{name}}']) < {{minItems}})) {
             $invalidProperties[] = "invalid value for '{{name}}', number of items must be greater than or equal to {{{minItems}}}.";
         }
 
@@ -267,51 +267,51 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^pa
 
         {{#vars}}
         {{#required}}
-        if ($this->container['{{name}}'] === null) {
+        if (array_key_exists('{{name}}', $this->container) && $this->container['{{name}}'] === null) {
             return false;
         }
         {{/required}}
         {{#isEnum}}
         {{^isContainer}}
         $allowedValues = $this->{{getter}}AllowableValues();
-        if (!in_array($this->container['{{name}}'], $allowedValues)) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}!in_array($this->container['{{name}}'], $allowedValues)) {
             return false;
         }
         {{/isContainer}}
         {{/isEnum}}
         {{#hasValidation}}
         {{#maxLength}}
-        if (strlen($this->container['{{name}}']) > {{maxLength}}) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}(strlen($this->container['{{name}}']) > {{maxLength}})) {
             return false;
         }
         {{/maxLength}}
         {{#minLength}}
-        if (strlen($this->container['{{name}}']) < {{minLength}}) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}(strlen($this->container['{{name}}']) < {{minLength}})) {
             return false;
         }
         {{/minLength}}
         {{#maximum}}
-        if ($this->container['{{name}}'] >{{#exclusiveMaximum}}={{/exclusiveMaximum}} {{maximum}}) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}($this->container['{{name}}'] >{{#exclusiveMaximum}}={{/exclusiveMaximum}} {{maximum}})) {
             return false;
         }
         {{/maximum}}
         {{#minimum}}
-        if ($this->container['{{name}}'] <{{#exclusiveMinimum}}={{/exclusiveMinimum}} {{minimum}}) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}($this->container['{{name}}'] <{{#exclusiveMinimum}}={{/exclusiveMinimum}} {{minimum}})) {
             return false;
         }
         {{/minimum}}
         {{#pattern}}
-        if (!preg_match("{{{pattern}}}", $this->container['{{name}}'])) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}!preg_match("{{{pattern}}}", $this->container['{{name}}'])) {
             return false;
         }
         {{/pattern}}
         {{#maxItems}}
-        if (count($this->container['{{name}}']) > {{maxItems}}) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}(count($this->container['{{name}}']) > {{maxItems}})) {
             return false;
         }
         {{/maxItems}}
         {{#minItems}}
-        if (count($this->container['{{name}}']) < {{minItems}}) {
+        if (array_key_exists('{{name}}', $this->container) && {{^required}}!is_null($this->container['{{name}}']) && {{/required}}(count($this->container['{{name}}']) < {{minItems}})) {
             return false;
         }
         {{/minItems}}
@@ -472,5 +472,14 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^pa
         }
 
         return json_encode(ObjectSerializer::sanitizeForSerialization($this));
+    }
+
+    /**
+     * Returns data which can be serialized by json_encode()
+     *
+     * @return mixed[]
+     */
+    public function jsonSerialize() {
+        return $this->container;
     }
 }
