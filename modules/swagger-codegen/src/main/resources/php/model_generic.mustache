@@ -368,7 +368,7 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^pa
      */
     public function {{getter}}()
     {
-        return $this->container['{{name}}'];
+        return array_key_exists('{{name}}', $this->container) ? $this->container['{{name}}'] : {{#defaultValue}}{{{defaultValue}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}};
     }
 
     /**
@@ -530,15 +530,16 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^pa
      *
      * @return array
      */
-    public function toArray($getAllAttributes = self::GET_ALL_ATTRIBUTES)
+    public function toArray($getAllAttributes = self::GET_SET_ATTRIBUTES)
     {
         if (!$getAllAttributes) {
             return $this->container;
         }
 
-        foreach (self::$attributeMap as $attribute) {
-            $data[$attribute] = $this->container[$attribute] ?? null;
-        }
+        $data = [];
+        {{#vars}}
+        $data['{{name}}'] = $this->{{getter}}();
+        {{/vars}}
 
         return $data;
     }

@@ -2298,6 +2298,7 @@ public class DefaultCodegen {
         op.isRestfulShow = op.isRestfulShow();
         op.isRestfulIndex = op.isRestfulIndex();
         op.isRestfulCreate = op.isRestfulCreate();
+        op.isRestfulCreateOrReplace = op.isRestfulCreateOrReplace();
         op.isRestfulUpdate = op.isRestfulUpdate();
         op.isRestfulDestroy = op.isRestfulDestroy();
         op.isRestful = op.isRestful();
