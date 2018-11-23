@@ -201,7 +201,7 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^pa
 
         {{#vars}}
         {{#required}}
-        if (array_key_exists('{{name}}', $this->container) && $this->container['{{name}}'] === null) {
+        if ($this->container['{{name}}'] === null) {
             $invalidProperties[] = "'{{name}}' can't be null";
         }
         {{/required}}
@@ -383,7 +383,7 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^pa
         {{#isEnum}}
         $allowedValues = $this->{{getter}}AllowableValues();
         {{^isContainer}}
-        if ({{^required}}!is_null(${{name}}) && {{/required}}!in_array(${{{name}}}, $allowedValues)) {
+        if ({{^required}}(${{name}} !== null) && {{/required}}!in_array(${{{name}}}, $allowedValues)) {
             throw new \InvalidArgumentException(
                 sprintf(
                     "Invalid value for '{{name}}', must be one of '%s'",
@@ -393,7 +393,7 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^pa
         }
         {{/isContainer}}
         {{#isContainer}}
-        if ({{^required}}!is_null(${{name}}) && {{/required}}array_diff(${{{name}}}, $allowedValues)) {
+        if ({{^required}}(${{name}} !== null) && {{/required}}array_diff(${{{name}}}, $allowedValues)) {
             throw new \InvalidArgumentException(
                 sprintf(
                     "Invalid value for '{{name}}', must be one of '%s'",
@@ -405,35 +405,35 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^pa
         {{/isEnum}}
         {{#hasValidation}}
         {{#maxLength}}
-        if ({{^required}}!is_null(${{name}}) && {{/required}}(strlen(${{name}}) > {{maxLength}})) {
+        if ({{^required}}(${{name}} !== null) && {{/required}}(strlen(${{name}}) > {{maxLength}})) {
             throw new \InvalidArgumentException('invalid length for ${{name}} when calling {{classname}}.{{operationId}}, must be smaller than or equal to {{maxLength}}.');
         }{{/maxLength}}
         {{#minLength}}
-        if ({{^required}}!is_null(${{name}}) && {{/required}}(strlen(${{name}}) < {{minLength}})) {
+        if ({{^required}}(${{name}} !== null) && {{/required}}(strlen(${{name}}) < {{minLength}})) {
             throw new \InvalidArgumentException('invalid length for ${{name}} when calling {{classname}}.{{operationId}}, must be bigger than or equal to {{minLength}}.');
         }
         {{/minLength}}
         {{#maximum}}
-        if ({{^required}}!is_null(${{name}}) && {{/required}}(${{name}} >{{#exclusiveMaximum}}={{/exclusiveMaximum}} {{maximum}})) {
+        if ({{^required}}(${{name}} !== null) && {{/required}}(${{name}} >{{#exclusiveMaximum}}={{/exclusiveMaximum}} {{maximum}})) {
             throw new \InvalidArgumentException('invalid value for ${{name}} when calling {{classname}}.{{operationId}}, must be smaller than {{^exclusiveMaximum}}or equal to {{/exclusiveMaximum}}{{maximum}}.');
         }
         {{/maximum}}
         {{#minimum}}
-        if ({{^required}}!is_null(${{name}}) && {{/required}}(${{name}} <{{#exclusiveMinimum}}={{/exclusiveMinimum}} {{minimum}})) {
+        if ({{^required}}(${{name}} !== null) && {{/required}}(${{name}} <{{#exclusiveMinimum}}={{/exclusiveMinimum}} {{minimum}})) {
             throw new \InvalidArgumentException('invalid value for ${{name}} when calling {{classname}}.{{operationId}}, must be bigger than {{^exclusiveMinimum}}or equal to {{/exclusiveMinimum}}{{minimum}}.');
         }
         {{/minimum}}
         {{#pattern}}
-        if ({{^required}}!is_null(${{name}}) && {{/required}}(!preg_match("{{{pattern}}}", ${{name}}))) {
+        if ({{^required}}(${{name}} !== null) && {{/required}}(!preg_match("{{{pattern}}}", ${{name}}))) {
             throw new \InvalidArgumentException("invalid value for ${{name}} when calling {{classname}}.{{operationId}}, must conform to the pattern {{{pattern}}}.");
         }
         {{/pattern}}
         {{#maxItems}}
-        if ({{^required}}!is_null(${{name}}) && {{/required}}(count(${{name}}) > {{maxItems}})) {
+        if ({{^required}}(${{name}} !== null) && {{/required}}(count(${{name}}) > {{maxItems}})) {
             throw new \InvalidArgumentException('invalid value for ${{name}} when calling {{classname}}.{{operationId}}, number of items must be less than or equal to {{maxItems}}.');
         }{{/maxItems}}
         {{#minItems}}
-        if ({{^required}}!is_null(${{name}}) && {{/required}}(count(${{name}}) < {{minItems}})) {
+        if ({{^required}}(${{name}} !== null) && {{/required}}(count(${{name}}) < {{minItems}})) {
             throw new \InvalidArgumentException('invalid length for ${{name}} when calling {{classname}}.{{operationId}}, number of items must be greater than or equal to {{minItems}}.');
         }
         {{/minItems}}
@@ -477,7 +477,7 @@ class {{classname}} {{#parentSchema}}extends {{{parent}}} {{/parentSchema}}{{^pa
      */
     public function offsetSet($offset, $value)
     {
-        if (is_null($offset)) {
+        if (null === $offset) {
             $this->container[] = $value;
         } else {
             $this->container[$offset] = $value;
