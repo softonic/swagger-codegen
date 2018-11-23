@@ -16,8 +16,8 @@ public class CodegenOperation {
             returnTypeIsPrimitive, returnSimpleType, subresourceOperation, isMapContainer,
             isListContainer, isMultipart, hasMore = true,
             isResponseBinary = false, isResponseFile = false, hasReference = false,
-            isRestfulIndex, isRestfulShow, isRestfulCreate, isRestfulUpdate, isRestfulDestroy,
-            isRestful, isDeprecated;
+            isRestfulIndex, isRestfulShow, isRestfulCreate, isRestfulCreateOrReplace, isRestfulUpdate,
+            isRestfulDestroy, isRestful, isDeprecated;
     public String path, operationId, returnType, httpMethod, returnBaseType,
             returnContainer, summary, unescapedNotes, notes, baseName, defaultResponse, discriminator;
     public List<Map<String, String>> consumes, produces, prioritizedContentTypes;
@@ -133,6 +133,15 @@ public class CodegenOperation {
     }
 
     /**
+     * Check if act as Restful create or replace method
+     *
+     * @return true if act as Restful create or replace method, false otherwise
+     */
+    public boolean isRestfulCreateOrReplace() {
+        return Arrays.asList("POST", "PUT").contains(httpMethod.toUpperCase());
+    }
+
+    /**
      * Check if act as Restful update method
      *
      * @return true if act as Restful update method, false otherwise
@@ -234,6 +243,8 @@ public class CodegenOperation {
             return false;
         if (isDeprecated != that.isDeprecated)
             return false;
+        if (isRestfulCreateOrReplace != that.isRestfulCreateOrReplace)
+            return false;
         if (path != null ? !path.equals(that.path) : that.path != null)
             return false;
         if (operationId != null ? !operationId.equals(that.operationId) : that.operationId != null)
@@ -319,6 +330,7 @@ public class CodegenOperation {
         result = 31 * result + (isResponseFile ? 13:31);
         result = 31 * result + (hasReference ? 13:31);
         result = 31 * result + (isDeprecated ? 13:31);
+        result = 31 * result + (isRestfulCreateOrReplace ? 13:31);
         result = 31 * result + (path != null ? path.hashCode() : 0);
         result = 31 * result + (operationId != null ? operationId.hashCode() : 0);
         result = 31 * result + (returnType != null ? returnType.hashCode() : 0);

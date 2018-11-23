@@ -25,6 +25,7 @@ use GuzzleHttp\Psr7\MultipartStream;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
 use {{invokerPackage}}\ApiException;
+use {{invokerPackage}}\Client\Model\ModelInterface;
 use {{invokerPackage}}\Configuration;
 use {{invokerPackage}}\HeaderSelector;
 use {{invokerPackage}}\ObjectSerializer;
@@ -425,6 +426,11 @@ use {{invokerPackage}}\ObjectSerializer;
             if ($httpBody instanceof \stdClass && $headers['Content-Type'] === 'application/json') {
                 $httpBody = \GuzzleHttp\json_encode($httpBody);
             }
+            {{#isRestfulCreateOrReplace}}
+            elseif ($httpBody instanceof ModelInterface && $headers['Content-Type'] === 'application/json') {
+                $httpBody = $httpBody->toArray(true);
+            }
+            {{/isRestfulCreateOrReplace}}
         } elseif (count($formParams) > 0) {
             if ($multipart) {
                 $multipartContents = [];
